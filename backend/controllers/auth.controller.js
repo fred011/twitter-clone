@@ -62,19 +62,34 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
+    // 1️⃣ Extract username and password from request body
     const { username, password } = req.body;
-    const user = await User.findOne({ username });
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user?.password || ""
-    );
 
-    if (!user || !isPasswordValid) {
+    // 2️⃣ Validate request data
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ error: "Username and password are required" });
+    }
+
+    // 3️⃣ Find user by username
+    const user = await User.findOne({ username });
+
+    // 4️⃣ Check if user exists and has a valid password
+    if (!user || !user.password) {
       return res.status(400).json({ error: "Invalid username or password" });
     }
 
+    // 5️⃣ Compare input password with stored hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Invalid username or password" });
+    }
+
+    // 6️⃣ Generate token and set cookie
     generateTokenAndSetCookie(user._id, res);
 
+    // 7️⃣ Respond with user details (excluding sensitive data)
     res.status(200).json({
       _id: user._id,
       fullName: user.fullName,
@@ -86,8 +101,9 @@ export const login = async (req, res) => {
       coverImg: user.coverImg,
     });
   } catch (error) {
+    // 8️⃣ Handle internal server errors
+    console.error("Error in LogIn Controller:", error.message);
     res.status(500).json({ error: "Internal Server Error" });
-    console.log("Error in LogIn Controller", error.message);
   }
 };
 
