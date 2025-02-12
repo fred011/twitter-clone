@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -11,8 +12,16 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import { useQuery } from "@tanstack/react-query";
 
 const ProfilePage = () => {
+  const {
+    data: authUser,
+    error,
+    isPending,
+    isError,
+  } = useQuery({ queryKey: ["authUser"] });
+
   const [coverImg, setCoverImg] = useState(null);
   const [profileImg, setProfileImg] = useState(null);
   const [feedType, setFeedType] = useState("posts");
@@ -30,7 +39,7 @@ const ProfilePage = () => {
     profileImg: "/avatars/boy2.png",
     coverImg: "/cover.png",
     bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    link: "https://youtube.com/@asaprogrammer_",
+    link: "https://youtube.com",
     following: ["1", "2", "3"],
     followers: ["1", "2", "3"],
   };
