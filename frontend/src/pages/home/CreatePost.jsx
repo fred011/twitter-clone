@@ -39,8 +39,7 @@ const CreatePost = () => {
         throw new Error(error);
       }
     },
-    onSuccess: (data) => {
-      console.log("New Post Data:", data);
+    onSuccess: () => {
       setText("");
       setImg(null);
       toast.success("Post created successfully");
