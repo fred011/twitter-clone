@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { formatMemberSinceDate } from "../../utils/date";
 
 import useFollow from "../../hooks/useFollow";
-// import useUpdateUserProfile from "../../hooks/useUpdateUserProfile";
+import useUpdateUserProfile from "../../hooks/useUpdateUserProfile";
 
 const ProfilePage = () => {
   const [coverImg, setCoverImg] = useState(null);
@@ -51,7 +51,7 @@ const ProfilePage = () => {
     },
   });
 
-  // const { isUpdatingProfile, updateProfile } = useUpdateUserProfile();
+  const { isUpdatingProfile, updateProfile } = useUpdateUserProfile();
 
   const isMyProfile = authUser._id === user?._id;
   const memberSinceDate = formatMemberSinceDate(user?.createdAt);
@@ -158,7 +158,7 @@ const ProfilePage = () => {
                     {!isPending && !amIFollowing && "Follow"}
                   </button>
                 )}
-                {/* {(coverImg || profileImg) && (
+                {(coverImg || profileImg) && (
                   <button
                     className="btn btn-primary rounded-full btn-sm text-white px-4 ml-2"
                     onClick={async () => {
@@ -169,7 +169,7 @@ const ProfilePage = () => {
                   >
                     {isUpdatingProfile ? "Updating..." : "Update"}
                   </button>
-                )} */}
+                )}
               </div>
 
               <div className="flex flex-col gap-4 mt-14 px-4">
