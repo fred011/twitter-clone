@@ -38,37 +38,45 @@ export const createPost = async (req, res) => {
 
 export const likeUnlikePost = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const { id: postId } = req.params;
+    const userId = req.user?._id; // Safely access userId
+    if (!userId) {
+      return res.status(400).json({ error: "User is not authenticated" });
+    }
 
+    const { id: postId } = req.params;
     const post = await Post.findById(postId);
 
     if (!post) return res.status(404).json({ error: "Post not found" });
 
-    const userLikedPost = post.likes.includes(userId);
+    // Ensure post.likes is an array
+    const likes = Array.isArray(post.likes) ? post.likes : [];
+
+    const userLikedPost = likes.includes(userId);
     if (userLikedPost) {
-      // unlike post
+      // Unlike post
       await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
       await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } });
 
-      const updatedLikes = post.likes.filter(
+      const updatedLikes = likes.filter(
         (id) => id.toString() !== userId.toString()
       );
       res.status(200).json(updatedLikes);
     } else {
-      //like post
-      post.likes.push(userId);
+      // Like post
+      likes.push(userId);
       await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } });
       await post.save();
 
-      const notification = new Notification({
-        from: userId,
-        to: post.user,
-        type: "like",
-      });
-      await notification.save();
-      const updatedLikes = post.likes;
+      if (post.user) {
+        const notification = new Notification({
+          from: userId,
+          to: post.user,
+          type: "like",
+        });
+        await notification.save();
+      }
 
+      const updatedLikes = likes;
       res.status(200).json(updatedLikes);
     }
   } catch (error) {
