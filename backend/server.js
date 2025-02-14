@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { v2 as cloudinary } from "cloudinary";
-
+import helmet from "helmet";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import postRoutes from "./routes/post.routes.js";
@@ -26,6 +26,18 @@ const __dirname = path.resolve();
 app.use(express.json({ limit: "10mb" })); // to parse req.body
 app.use(express.urlencoded({ extended: true })); // to parse form data(req.body)
 app.use(cookieParser());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        imgSrc: ["'self'", "data:", "https://twitter-clone-i8jj.onrender.com"],
+      },
+    },
+  })
+);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
